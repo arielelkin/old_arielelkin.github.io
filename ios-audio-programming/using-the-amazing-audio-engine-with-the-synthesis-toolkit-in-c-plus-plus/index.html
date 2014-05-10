@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Using the Amazing Audio Engine With the Synthesis Toolkit in C++ - Ariel Elkin's Website</title>
+  <meta name="author" content="Ariel Elkin">
+
+  
+  <meta name="description" content="Using the Amazing Audio Engine With the Synthesis Toolkit in C++ Dec 27th, 2013 Intro In this tutorial we&rsquo;ll explore a technique for making &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yoursite.com/ios-audio-programming/using-the-amazing-audio-engine-with-the-synthesis-toolkit-in-c-plus-plus">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Ariel Elkin's Website" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/appbox.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ariel Elkin's Website</a></h1>
+  
+    <h2>Objective-C, Audio Programming, Programming Philosophy.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:yoursite.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects">My projects</a></li>
+  <li><a href="/objective-c">Objective-C</a></li>
+  <li><a href="/ios-programming">iOS Programming</a></li>
+  <li><a href="/ios-audio-programming">iOS Audio Programming</a></li>
+  <li><a href="/Portfolio">Sounds</a></li>
+  <li><a href="/">Philosophy</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Using the Amazing Audio Engine With the Synthesis Toolkit in C++</h1>
+    <p class="meta">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-27T03:05:00-05:00" pubdate data-updated="true">Dec 27<span>th</span>, 2013</time></p>
+  </header>
+  
+  <h2>Intro</h2>
+
+<p>In this tutorial we&rsquo;ll explore a technique for making musical instrument apps on iOS, by combining two fantastic open-source libraries: The Amazing Audio Engine and the Synthesis Toolkit in C++.</p>
+
+<p>A good musical instrument needs to offer the user a substantial amount of control over its sound. Music-makers expect to be able to control several attributes of a sound, not just its onset. So the more fine-grained control <em>our code</em> has over the generation and manipulation of sound, the more fine-grained control we can offer the user. Generating the sound from scratch (i.e. not from a sound file), like non-virtual instruments do, is one of the ways to achieve that goal; we&rsquo;ll make an app that will generate and control its own sounds.</p>
+
+<p>We&rsquo;ll need an audio <em>synthesizer</em> to generate the samples of audio in response to user input, and an <em>audio engine</em> that will deliver the audio to the user. We&rsquo;ll use The Amazing Audio Engine as our audio engine and a class from the Synthesis Toolkit in C++ as our synthesizer.</p>
+
+<p>Our final result will be a handheld mandolin.</p>
+
+<h2>First steps</h2>
+
+<ol>
+<li>Open up Xcode and create a new project.</li>
+<li>In &ldquo;Choose a template for your new project&rdquo;:
+
+<ol>
+<li>Under the heading &ldquo;iOS&rdquo;, pick <strong>Application</strong></li>
+<li>Choose <strong>Single View Application</strong></li>
+<li>Click <strong>Next</strong></li>
+</ol>
+</li>
+<li>In &ldquo;Choose options for your new project&rdquo;:
+
+<ol>
+<li>For &ldquo;Product Name&rdquo;, enter <strong>Mandolin</strong></li>
+<li>Under &ldquo;Devices&rdquo;, select <strong>iPhone</strong>.</li>
+</ol>
+</li>
+<li>Click <strong>Next</strong> and save the project somewhere dear to you.</li>
+</ol>
+
+
+<h2>Add the Amazing Audio Engine</h2>
+
+<ol>
+<li>Add The Amazing Audio Engine to your project.
+
+<ol>
+<li>If you&rsquo;re using CocoaPods, add <code>pod 'TheAmazingAudioEngine', '~&gt; 1.3'</code> to your podfile and run <code>pod install</code>. Remember to close <strong>Mandolin.xcodeproj</strong> and use <strong>Mandolin.xcworkspace</strong> instead.</li>
+<li>If you&rsquo;re not using CocoaPods, <a href="http://theamazingaudioengine.com/doc/_getting-_started.html">visit this page</a> and follow steps 1-6 to the letter.</li>
+</ol>
+</li>
+<li>Open <strong>AppDelegate.m</strong>, under <code>#import "AppDelegate.h"</code> write</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AEAudioController.h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let’s see if you’ve correctly added TAAE. Build (⌘+B), make sure the build succeeds. If the build fails, you haven’t followed the above steps to the letter, go back and make sure you do. If the build succeeds, you get to move on.</p>
+
+<h2>Our audio plumbing</h2>
+
+<p>We&rsquo;ll be generating our Mandolin sound within a <em>channel</em>, and we&rsquo;ll connect this channel directly to the <em>audio engine</em>. The audio engine gathers the sound it receives from all the channels connected to it, and sends it to the headphones or speaker.</p>
+
+<p>Let&rsquo;s now set up our app&rsquo;s <em>audio engine</em>. Our audio engine will be the thing responsible for managing audio sources and outputs, and communicating with the OS. In TAAE, <code>AEAudioController</code> is the class that wraps the audio engine. We will place it inside our app delegate, for a couple of reasons:</p>
+
+<ul>
+<li>The app delegate should handle launch-time initialization of our core app components, and those include our audio engine.</li>
+<li>Given that the app delegate manages transitions to and from the background, it should deal with the audio engine during those transitions. For example, it should suspend audio rendering when our app is sent to the background.</li>
+</ul>
+
+
+<p>Open <strong>AppDelegate.h</strong>, write this above <code>#import &lt;UIKit/UIKit.h&gt;</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@class</span> <span class="nc">AEAudioController</span>;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a <a href="http://stackoverflow.com/questions/5191487/objective-c-forward-class-declaration">forward declaration</a> of <code>AEAudioController</code>. We&rsquo;ll be importing <strong>AEAudioController.h</strong> in the app delegate&rsquo;s implementation (it&rsquo;s cleaner to import it here to avoid circular inclusions of files).</p>
+
+<p>Let&rsquo;s now add an <code>AEAudioController</code> property to our <code>AppDelegate</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">readonly</span><span class="p">)</span> <span class="n">AEAudioController</span> <span class="o">*</span><span class="n">audioController</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Other files will be able to refer to the <code>audioController</code> variable, but we&rsquo;re adding the <code>readonly</code> identifier because we don&rsquo;t want to let them change what it points to.</p>
+
+<p>Open <strong>AppDelegate.m</strong>. Under the <code>#import "AppDelegate.h"</code> line we wrote earlier on, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n">AEAudioController</span> <span class="o">*</span><span class="n">audioController</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a <a href="https://developer.apple.com/library/ios/documentation/cocoa/conceptual/ProgrammingWithObjectiveC/CustomizingExistingClasses/CustomizingExistingClasses.html">class extension</a> in which we allow the implementation of AppDelegate to actually set its <code>audioController</code> property.</p>
+
+<p>At the end of the <code>application:didFinishLaunchingWithOptions</code> method, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">self</span><span class="p">.</span><span class="n">audioController</span> <span class="o">=</span> <span class="p">[[</span><span class="n">AEAudioController</span> <span class="n">alloc</span><span class="p">]</span>
+</span><span class='line'>                        <span class="nl">initWithAudioDescription:</span><span class="p">[</span><span class="n">AEAudioController</span> <span class="n">nonInterleavedFloatStereoAudioDescription</span><span class="p">]</span>
+</span><span class='line'>                        <span class="nl">inputEnabled:</span><span class="n">NO</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Your <strong>AppDelegate.m</strong> should look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span><span class='line'><span class="cp">#import &quot;AEAudioController.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">AppDelegate</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n">AEAudioController</span> <span class="o">*</span><span class="n">audioController</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">AppDelegate</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="n">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didFinishLaunchingWithOptions:</span><span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="p">)</span><span class="nv">launchOptions</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">// Override point for customization after application launch.</span>
+</span><span class='line'>    <span class="n">self</span><span class="p">.</span><span class="n">audioController</span> <span class="o">=</span> <span class="p">[[</span><span class="n">AEAudioController</span> <span class="n">alloc</span><span class="p">]</span>
+</span><span class='line'>                            <span class="nl">initWithAudioDescription:</span><span class="p">[</span><span class="n">AEAudioController</span> <span class="n">nonInterleavedFloatStereoAudioDescription</span><span class="p">]</span>
+</span><span class='line'>                            <span class="nl">inputEnabled:</span><span class="n">NO</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">YES</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ll now start the audio engine in the main view controller. Open up <strong>ViewController.m</strong>. Under <code>#import "ViewController.h"</code>, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AppDelegate.h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In <code>viewDidLoad</code>, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">super</span> <span class="n">viewDidLoad</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">AppDelegate</span> <span class="o">*</span><span class="n">appDelegate</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIApplication</span> <span class="n">sharedApplication</span><span class="p">]</span> <span class="n">delegate</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSError</span> <span class="o">*</span><span class="n">errorAudioSetup</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">BOOL</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[[</span><span class="n">appDelegate</span> <span class="n">audioController</span><span class="p">]</span> <span class="nl">start:</span><span class="o">&amp;</span><span class="n">errorAudioSetup</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">result</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Error starting audio engine: %@&quot;</span><span class="p">,</span> <span class="n">errorAudioSetup</span><span class="p">.</span><span class="n">localizedDescription</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s break this down. First, we get a reference to our app delegate instance. It needs to be of class <code>AppDelegate</code> because we need to use its <code>audioController</code> property.</p>
+
+<p>Then, we send a <code>start</code> message to the audioController, to tell it to start processing audio. <code>start</code> returns a <code>BOOL</code>: <code>YES</code> if it successfully started the audio engine, and <code>NO</code> otherwise. <code>start</code>&rsquo;s only parameter is a pointer to an <code>NSError</code> object, and if an error occurs, the pointer is set to an error object containing the error information.  We want to be prepared for any errors; so we&rsquo;ll check <code>start</code>&rsquo;s return value, if there&rsquo;s an error, print <code>errorAudioSetup</code>, let the user gracefully know, etc.</p>
+
+<h3>Freakin&#8217; rawwaves</h3>
+
+<p><code>Mandolin</code> makes use of hard-coded waveforms to generate sound. These waveforms are in the STK, but we currently need to manually tell the STK where they are. To do that, at the bottom of the <code>viewDidLoad</code> code we wrote, add this line:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">stk</span><span class="o">::</span><span class="n">Stk</span><span class="o">::</span><span class="n">setRawwavePath</span><span class="p">([[[</span><span class="n">NSBundle</span> <span class="n">mainBundle</span><span class="p">]</span> <span class="n">resourcePath</span><span class="p">]</span> <span class="n">UTF8String</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Add the STK</h2>
+
+<p><a href="/setting-up-the-stk-on-ios">Visit this page</a> and follow the instructions there to add the STK to your project.</p>
+
+<h2>Building our mandolin</h2>
+
+<p>Rename <strong>ViewController.m</strong> to <strong>ViewController.mm</strong>. STK source files are written in C++, so any source file that imports them must be Objective-C++. This is how you let Xcode know.</p>
+
+<p>Open <strong>ViewController.mm</strong> and under <code>#import "AppDelegate.h"</code>, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AEBlockChannel.h&quot;</span>
+</span><span class='line'><span class="cp">#import &quot;Mandolin.h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>The mandolin&rsquo;s user interface</h3>
+
+<p>Let&rsquo;s now make the UI for the mandolin. The user will pluck the mandolin by pressing a button, and will change the mandolin&rsquo;s pitch by moving a slider. Open up the Storyboard, drag and drop a Button and a Slider onto the screen:</p>
+
+<p><img src="http://i.imgur.com/RDFxrAI.png"></p>
+
+<p>A mandolin&rsquo;s frequency usually varies between 200Hz and 3000Hz, but by default <code>UISliders</code> send values between <code>0</code> to <code>1</code>. So we want the slider&rsquo;s minimum and maximum values to reflect that. Click on the slider, then click on the fourth button at the top of the inspector pane on the right. Set &ldquo;Minimum&rdquo; to <strong>200</strong> and set &ldquo;Maximum&rdquo; to <strong>1000</strong> (yes, we could set this to <strong>3000</strong> as mandolins do go above 1000Hz, but for our prototyping purposes <strong>1000</strong> is fine). Set &ldquo;Current&rdquo; to <strong>400</strong>.</p>
+
+<p><img src="http://imgur.com/sBLC5dn.png"></p>
+
+<p>Open <strong>ViewController.mm</strong>, in the class extension, add a property for our <code>Mandolin</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">ViewController</span> <span class="p">()</span>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n">stk</span><span class="o">::</span><span class="n">Mandolin</span> <span class="o">*</span><span class="n">myMandolin</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In case you&rsquo;re wondering, we prefixed <code>Mandolin</code> with <code>stk::</code> to indicate that <code>Mandolin</code> is part of the STK&rsquo;s <em>namespace</em> (a <a href="http://www.cplusplus.com/doc/tutorial/namespaces/">namespace</a> is a way in which classes and variables are grouped together in C++, and the STK groups its peeps in the <code>stk</code> namespace).</p>
+
+<p>We&rsquo;ll be creating a <code>Mandolin</code> instance which will generate sound when plucked, and whose frequency/pitch we can adjust.</p>
+
+<p>Write the two methods that define the behaviour for the button and slider:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span><span class="p">(</span><span class="kt">IBAction</span><span class="p">)</span><span class="nf">pluckMyMandolin</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">self</span><span class="p">.</span><span class="n">myMandolin</span><span class="o">-&gt;</span><span class="n">pluck</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">-</span><span class="p">(</span><span class="kt">IBAction</span><span class="p">)</span><span class="nf">changeFrequency:</span><span class="p">(</span><span class="n">UISlider</span> <span class="o">*</span><span class="p">)</span><span class="nv">sender</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">self</span><span class="p">.</span><span class="n">myMandolin</span><span class="o">-&gt;</span><span class="n">setFrequency</span><span class="p">(</span><span class="n">sender</span><span class="p">.</span><span class="n">value</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s tell the button and the slider that these are the methods they&rsquo;re dealing with. Save <strong>ViewController.mm</strong> and go back into the Storyboard. Leave <code>control</code> pressed and click and drag from the &ldquo;Pluck my mandolin&rdquo; button to the yellow circle at the bottom of the view controller. Let go, and select <strong>pluckMyMandolin</strong></p>
+
+<p>Do the same for the slider. Leave <code>control</code> pressed and click and drag from the slider to the yellow circle at the bottom of the view controller. Let go, and this time select <strong>changeFrequency:</strong></p>
+
+<p>That&rsquo;s the basics of our UI.</p>
+
+<h2>The mandolin&rsquo;s back-end</h2>
+
+<p>In our ViewController&rsquo;s class extension, add a property for our <code>AEBlockChannel</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">ViewController</span> <span class="p">()</span>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n">AEBlockChannel</span> <span class="o">*</span><span class="n">myMandolinChannel</span><span class="p">;</span>
+</span><span class='line'><span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="n">stk</span><span class="o">::</span><span class="n">Mandolin</span> <span class="o">*</span><span class="n">myMandolin</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&rsquo;s create our Mandolin and place it inside a channel. At the bottom of <code>viewDidLoad</code>, write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">self</span><span class="p">.</span><span class="n">myMandolin</span> <span class="o">=</span> <span class="n">new</span> <span class="n">stk</span><span class="o">::</span><span class="n">Mandolin</span><span class="p">(</span><span class="mi">400</span><span class="p">);</span>
+</span><span class='line'><span class="n">self</span><span class="p">.</span><span class="n">myMandolin</span><span class="o">-&gt;</span><span class="n">setFrequency</span><span class="p">(</span><span class="mi">400</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">self</span><span class="p">.</span><span class="n">myMandolinChannel</span> <span class="o">=</span> <span class="p">[</span><span class="n">AEBlockChannel</span> <span class="nl">channelWithBlock:</span><span class="o">^</span><span class="p">(</span><span class="k">const</span> <span class="n">AudioTimeStamp</span>  <span class="o">*</span><span class="n">time</span><span class="p">,</span>
+</span><span class='line'>                                                            <span class="n">UInt32</span> <span class="n">frames</span><span class="p">,</span>
+</span><span class='line'>                                                            <span class="n">AudioBufferList</span> <span class="o">*</span><span class="n">audio</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span> <span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">frames</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">((</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="n">audio</span><span class="o">-&gt;</span><span class="n">mBuffers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">mData</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span>
+</span><span class='line'>        <span class="p">((</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="n">audio</span><span class="o">-&gt;</span><span class="n">mBuffers</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">mData</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">myMandolin</span><span class="o">-&gt;</span><span class="n">tick</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[[</span><span class="n">appDelegate</span> <span class="n">audioController</span><span class="p">]</span> <span class="nl">addChannels:</span><span class="err">@</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">myMandolinChannel</span><span class="p">]];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We first initialise a new <code>Mandolin</code> object, and set its frequency to 400.</p>
+
+<p>We then create an <code>AEBlockChannel</code>, which takes in a block as a parameter. This block, in turn, has parameters <em>in which</em> you have to store the audio you generate: we&rsquo;ll be generating audio one sample at a time and placing it in the audio buffers on their way to the headphones.</p>
+
+<h3>Understanding AudioBuffers</h3>
+
+<p>This <code>for</code> loop generates consecutive samples of audio with <code>self.myMandolin-&gt;tick()</code> and places them in the audio buffers.</p>
+
+<p>The STK works with <em>non-interleaved</em> audio, which means that there is one <code>AudioBuffer</code> for the left channel: <code>audio-&gt;mBuffers[0]</code>, and one <code>AudioBuffer</code> for the right channel: <code>audio-&gt;mBuffers[1]</code>.</p>
+
+<p>An <code>AudioBuffer</code> is a <code>struct</code> that contains audio (and data about the audio). Its <code>mData</code> member points to the buffer&rsquo;s audio data. This is an array, each member of this array is a sample.</p>
+
+<p>The <code>frames</code> argument in the block specifies the number of samples in a buffer, i.e. the length of the array.</p>
+
+<p>The STK classes compute and output one consecutive sample at a time, their <code>tick()</code> function returns one sample of computed audio, which we place in our audio buffers. The STK objects tick according to their state. So <code>tick()</code> returns <code>0</code> (i.e. silence) if we haven&rsquo;t plucked the mandolin, but if you pluck it it&rsquo;ll start to return a number.</p>
+
+<p>Note that <code>Mandolin</code> produces mono sound, which is we&rsquo;re placing its sample in both the left and the right channel.</p>
+
+<h2>Outro</h2>
+
+<p><img class="right" src="http://i.imgur.com/eers5TK.png"></p>
+
+<p>Good musical apps often require synthesizers and audio engines. Making a speedy and robust audio engine requires a substantial amount of engineering, and delving into complex and unsavoury APIs. Making an interesting synthesizer also requires a good amount of basic audio engineering.</p>
+
+<p>It&rsquo;s better to focus your efforts on the experience your instrument will provide. Interesting ways for the user to interact with your instrument. The users can drag user interface elements accross the screen, rotate user interface elements, double tap buttons, use the accelerometer. What sort of interactions would make your instrument unique? And what should the instrument&rsquo;s sonic response be?</p>
+
+<p>You have a readymade audio engine, and readymade synthesizers. Customise them, build on top of that, and you&rsquo;ll spend more time refining the user experience and less time re-inventing the wheel.</p>
+
+<p>Speaking of which, here&rsquo;s some pretty assets to get you started. They&rsquo;ve been tailor-made for us by the amazing <a href="http://marazita.com">Justin Marazita</a>.</p>
+
+<h2>Sample project</h2>
+
+<p>To see what this looks like when complete, check out this sample project:</p>
+
+<ul>
+<li><a href="https://github.com/bellpipe/mandolin">The Mandolin on GitHub</a></li>
+</ul>
+
+
+<h2>Further reading</h2>
+
+<ul>
+<li><a href="https://ccrma.stanford.edu/software/stk/classstk_1_1Mandolin.html">The Mandolin&rsquo;s Documentation</a>
+
+<ul>
+<li>There are many more things you can do with the mandolin, read this thoroughly.</li>
+</ul>
+</li>
+<li><a href="http://theamazingaudioengine.com/doc/">The Amazing Audio Engine Documentation</a></li>
+</ul>
+
+
+<h2>Thanks to</h2>
+
+<ul>
+<li><a href="http://atastypixel.com/">Michael Tyson</a> for useful pointers on developing with TAAE.</li>
+<li>Daniel Kent and Péter Gyurkó for helping develop this tutorial.</li>
+</ul>
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-27T03:05:00-05:00" pubdate data-updated="true">Dec 27<span>th</span>, 2013</time>
+        
+      </p>
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://yoursite.com/ios-audio-programming/using-the-amazing-audio-engine-with-the-synthesis-toolkit-in-c-plus-plus/index.html" data-via="arivocals" data-counturl="http://yoursite.com/ios-audio-programming/using-the-amazing-audio-engine-with-the-synthesis-toolkit-in-c-plus-plus/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ariel Elkin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

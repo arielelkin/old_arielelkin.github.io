@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NSURLSession Techniques - Ariel Elkin's Website</title>
+  <meta name="author" content="Ariel Elkin">
+
+  
+  <meta name="description" content="NSURLSession Techniques Mar 3rd, 2014 Introduction In this article I&rsquo;ll offer some NSURLSession techniques to accomplish common networking &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yoursite.com/ios-programming/nsurlsession-techniques">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Ariel Elkin's Website" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/appbox.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ariel Elkin's Website</a></h1>
+  
+    <h2>Objective-C, Audio Programming, Programming Philosophy.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:yoursite.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects">My projects</a></li>
+  <li><a href="/objective-c">Objective-C</a></li>
+  <li><a href="/ios-programming">iOS Programming</a></li>
+  <li><a href="/ios-audio-programming">iOS Audio Programming</a></li>
+  <li><a href="/Portfolio">Sounds</a></li>
+  <li><a href="/">Philosophy</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">NSURLSession Techniques</h1>
+    <p class="meta">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-03T18:34:00-05:00" pubdate data-updated="true">Mar 3<span>rd</span>, 2014</time></p>
+  </header>
+  
+  <h2>Introduction</h2>
+
+<p>In this article I&rsquo;ll offer some <code>NSURLSession</code> techniques to accomplish common networking functionality required in an app:</p>
+
+<ul>
+<li><strong>Data fetches</strong>: Reading data from a remote URL to memory.</li>
+<li><strong>File downloads</strong>: Downloading a file from a remote URL and saving it to disk.</li>
+<li><strong>Background downloads</strong>: Downloading a (large) file from a remote URL and saving it to disk, in the background (i.e. even if your app is closed).</li>
+</ul>
+
+
+<p>Here&rsquo;s the code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &lt;Foundation/Foundation.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@interface</span> <span class="nc">Networker</span> : <span class="nc">NSObject</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">fetchContentsOfURL:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+</span><span class='line'>                <span class="nf">completion:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span> <span class="n">completionHandler</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">downloadFileAtURL:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+</span><span class='line'>               <span class="nf">toLocation:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">destinationURL</span>
+</span><span class='line'>               <span class="nf">completion:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span> <span class="n">completionHandler</span><span class="p">;</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">Networker</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="n">NSURLSession</span> <span class="o">*</span><span class="p">)</span><span class="nf">dataSession</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">static</span> <span class="n">NSURLSession</span> <span class="o">*</span><span class="n">session</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">static</span> <span class="n">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">session</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLSession</span> <span class="nl">sessionWithConfiguration:</span><span class="p">[</span><span class="n">NSURLSessionConfiguration</span> <span class="n">defaultSessionConfiguration</span><span class="p">]];</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">session</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">fetchContentsOfURL:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span>
+</span><span class='line'>                <span class="nf">completion:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span> <span class="n">completionHandler</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSURLSessionDataTask</span> <span class="o">*</span><span class="n">dataTask</span> <span class="o">=</span>
+</span><span class='line'>    <span class="p">[[</span><span class="n">self</span> <span class="n">dataSession</span><span class="p">]</span> <span class="nl">dataTaskWithURL:</span><span class="n">url</span>
+</span><span class='line'>                      <span class="nl">completionHandler:</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="o">^</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>         <span class="k">if</span> <span class="p">(</span><span class="n">completionHandler</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>         <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>             <span class="n">completionHandler</span><span class="p">(</span><span class="nb">nil</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+</span><span class='line'>             <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>         <span class="p">}</span>
+</span><span class='line'>         <span class="n">completionHandler</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">nil</span><span class="p">);</span>
+</span><span class='line'>     <span class="p">}];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="n">dataTask</span> <span class="n">resume</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">downloadFileAtURL:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="n">url</span>
+</span><span class='line'>               <span class="nl">toLocation:</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="n">destinationURL</span>
+</span><span class='line'>               <span class="nl">completion:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span> <span class="n">completionHandler</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSURLSessionDownloadTask</span> <span class="o">*</span><span class="n">fileDownloadTask</span> <span class="o">=</span>
+</span><span class='line'>    <span class="p">[[</span><span class="n">self</span> <span class="n">dataSession</span><span class="p">]</span> <span class="nl">downloadTaskWithRequest:</span><span class="p">[</span><span class="n">NSURLRequest</span> <span class="nl">requestWithURL:</span><span class="n">url</span><span class="p">]</span>
+</span><span class='line'>                              <span class="nl">completionHandler:</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="o">^</span><span class="p">(</span><span class="n">NSURL</span> <span class="o">*</span><span class="n">location</span><span class="p">,</span> <span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>         <span class="k">if</span> <span class="p">(</span><span class="n">completionHandler</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>         <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>             <span class="n">completionHandler</span><span class="p">(</span><span class="n">error</span><span class="p">);</span>
+</span><span class='line'>             <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>         <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>         <span class="n">NSError</span> <span class="o">*</span><span class="n">fileError</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>         <span class="p">[[</span><span class="n">NSFileManager</span> <span class="n">defaultManager</span><span class="p">]</span> <span class="nl">removeItemAtURL:</span><span class="n">destinationURL</span> <span class="nl">error:</span><span class="nb">NULL</span><span class="p">];</span>
+</span><span class='line'>         <span class="p">[[</span><span class="n">NSFileManager</span> <span class="n">defaultManager</span><span class="p">]</span> <span class="nl">moveItemAtURL:</span><span class="n">location</span> <span class="nl">toURL:</span><span class="n">destinationURL</span> <span class="nl">error:</span><span class="o">&amp;</span><span class="n">fileError</span><span class="p">];</span>
+</span><span class='line'>         <span class="n">completionHandler</span><span class="p">(</span><span class="n">fileError</span><span class="p">);</span>
+</span><span class='line'>     <span class="p">}];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="n">fileDownloadTask</span> <span class="n">resume</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Technique 1: Wrap NSURLSession</h3>
+
+<p>You can see that our networking code is inside a <code>Networker</code> class, isolated from other code, we didn&rsquo;t shove it inside, say, a <code>UIViewController</code> subclass.</p>
+
+<p>You&rsquo;ll probably have more than one class in your app that needs data from the internet, but you don&rsquo;t want to replicate the same networking code in every single class that downloads or uploads data. What you should do is create a class that <em>wraps</em> <code>NSURLSession</code>, and whose responsibility is to be a networking hub that manages all your app&rsquo;s networking needs. This class will in turn be used by classes which require downloading or uploading, without them having to know or worry about <code>NSURLSession</code>.</p>
+
+<p>This is based on the assumption that all classes that use <code>Networker</code> are satisfied with an <code>NSURLSession</code> being configured in a single way. But if we have more complex requirements in which, for example, two different classes using two different remote APIs need to use two different timeout intervals for their requests, you&rsquo;ll be better off making making a <code>Networker</code> subclass for each use case, in which you adequately override <code>dataSession</code>.</p>
+
+<h3>Technique 2: Provide the session via a static singleton method</h3>
+
+<p><code>+[Networker dataSession]</code> is a static singleton method that returns a singleton <code>NSURLSession</code> object used for data fetches and file downloads. The more we centralise our networking, the easier it will be to control it. Advantages:</p>
+
+<ul>
+<li>You don&rsquo;t have to create and configure a <code>NSURLSession</code> object every time you want to create a <code>NSURLSessionTask</code></li>
+<li>You centralise all the information relative to the active tasks in one place. For example, you can do:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">[</span><span class="n">self</span> <span class="n">dataSession</span><span class="p">]</span> <span class="nl">getTasksWithCompletionHandler:</span><span class="o">^</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">dataTasks</span><span class="p">,</span> <span class="n">NSArray</span> <span class="o">*</span><span class="n">uploadTasks</span><span class="p">,</span> <span class="n">NSArray</span> <span class="o">*</span><span class="n">downloadTasks</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Here are my data tasks: %@&quot;</span><span class="p">,</span> <span class="n">dataTasks</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>You centralise control of all the <code>NSURLSessionTasks</code>, rather than having to make method calls on each individual one. For example:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">[[</span><span class="n">self</span> <span class="n">dataSession</span><span class="p">]</span> <span class="n">invalidateAndCancel</span><span class="p">];</span>
+</span><span class='line'><span class="p">[[</span><span class="n">self</span> <span class="n">dataSession</span><span class="p">]</span> <span class="nl">flushWithCompletionHandler:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Technique 3: Provide a completion block as a method parameter</h3>
+
+<p>This is partly a matter of style. When you&rsquo;re writing code that uses <code>Networker</code>, it tends to be more readable if the sequence of actions is clear.</p>
+
+<p>This is also a matter of convenience, as the block will easily let you use variables available just in the scope of the method in which the networking was invoked.</p>
+
+<p>Let&rsquo;s do a quick example. Suppose we are inside a separate class. Now our block-based implementation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">userPressedButton</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">__block</span> <span class="n">NSDate</span> <span class="o">*</span><span class="n">timeButtonPressed</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDate</span> <span class="n">date</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">Networker</span> <span class="nl">fetchContentsOfURL:</span><span class="n">url</span> <span class="nl">completion:</span><span class="o">^</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">self</span> <span class="nl">useData:</span><span class="n">data</span> <span class="nl">forDate:</span><span class="n">timeButtonPressed</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With a delegate-based implementation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">SomeClass</span> : <span class="nc">NSObject</span> <span class="o">&lt;</span><span class="n">NetworkerDelegate</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">SomeClass</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">NSDate</span> <span class="o">*</span><span class="n">timeButtonPressed</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">userPressedButton</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">timeButtonPressed</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSDate</span> <span class="n">date</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">Networker</span> <span class="nl">fetchContentsOfURL:</span><span class="n">url</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//56 lines further down...</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">networkerDidGetData:</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">data</span> <span class="nl">error:</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="p">)</span><span class="n">error</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">self</span> <span class="nl">useData:</span><span class="n">data</span> <span class="nl">forDate:</span><span class="n">timeButtonPressed</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The block-based alternative is shorter and more readable.</p>
+
+<p>Also, remember that calling a block that&rsquo;s <code>nil</code> results in a crash, so we check we do have a <code>completionHandler</code> before calling it.</p>
+
+<h3>Technique 4: Use class methods</h3>
+
+<p>There is little use for <code>Networker</code> to have instance variables if it is going to be a single, centralised networking hub.</p>
+
+<p>The main advantage of class methods is that it avoids other objects the hassle about having to manage <code>Networker</code> instances.</p>
+
+<p>Note that we are assuming that we are not required to report the progress of individual NSURLSessionTasks. If you&rsquo;re downloading potentially large and need to report the download progress to your users, then you need <code>Networker</code></p>
+
+<h3>Trying it out</h3>
+
+<p>We&rsquo;re going to put our <code>Networker</code> to the test, by using it on two free online APIs:
+* We&rsquo;ll use the Open Weather Map API to get temperature data for Kathmandu.
+* We&rsquo;ll use the Reddit API to download images.</p>
+
+<p>Here&rsquo;s the idea:</p>
+
+<ol>
+<li>Fetch the title of the top post on the front page of Reddit.</li>
+<li>Use that as a search query to search for a picture on Reddit.</li>
+<li>Download the image and display it.</li>
+</ol>
+
+
+<p>Open <strong>ViewController.m</strong> and add these lines:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;Networker.h&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">ViewController</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidAppear:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">animated</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">super</span> <span class="nl">viewDidAppear:</span><span class="n">animated</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSURL</span> <span class="o">*</span><span class="n">redditFrontPageJSON</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURL</span> <span class="nl">URLWithString:</span><span class="s">@&quot;http://www.reddit.com/r/pics.json&quot;</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="n">Networker</span> <span class="nl">fetchContentsOfURL:</span><span class="n">redditFrontPageJSON</span> <span class="nl">completion:</span><span class="o">^</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">error</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">NSError</span> <span class="o">*</span><span class="n">jsonParsingError</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">NSDictionary</span> <span class="o">*</span><span class="n">redditJSON</span> <span class="o">=</span> <span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="p">)[</span><span class="n">NSJSONSerialization</span> <span class="nl">JSONObjectWithData:</span><span class="n">data</span> <span class="nl">options:</span><span class="n">kNilOptions</span> <span class="nl">error:</span><span class="o">&amp;</span><span class="n">jsonParsingError</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">jsonParsingError</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">NSArray</span> <span class="o">*</span><span class="n">redditPosts</span> <span class="o">=</span> <span class="n">redditJSON</span><span class="p">[</span><span class="s">@&quot;data&quot;</span><span class="p">][</span><span class="s">@&quot;children&quot;</span><span class="p">];</span>
+</span><span class='line'>                <span class="n">NSDictionary</span> <span class="o">*</span><span class="n">topPost</span> <span class="o">=</span> <span class="p">[</span><span class="n">redditPosts</span> <span class="n">firstObject</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="n">NSString</span> <span class="o">*</span><span class="n">thumbnailURL</span> <span class="o">=</span> <span class="n">topPost</span><span class="p">[</span><span class="s">@&quot;data&quot;</span><span class="p">][</span><span class="s">@&quot;thumbnail&quot;</span><span class="p">];</span>
+</span><span class='line'>                <span class="n">NSURL</span> <span class="o">*</span><span class="n">documents</span> <span class="o">=</span> <span class="p">[[[</span><span class="n">NSFileManager</span> <span class="n">defaultManager</span><span class="p">]</span> <span class="nl">URLsForDirectory:</span><span class="n">NSDocumentDirectory</span> <span class="nl">inDomains:</span><span class="n">NSUserDomainMask</span><span class="p">]</span> <span class="n">firstObject</span><span class="p">];</span>
+</span><span class='line'>                <span class="n">NSURL</span> <span class="o">*</span><span class="n">fileURL</span> <span class="o">=</span> <span class="p">[</span><span class="n">documents</span> <span class="nl">URLByAppendingPathComponent:</span><span class="p">[</span><span class="n">thumbnailURL</span> <span class="n">lastPathComponent</span><span class="p">]];</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="p">[</span><span class="n">Networker</span> <span class="nl">downloadFileAtURL:</span><span class="p">[</span><span class="n">NSURL</span> <span class="nl">URLWithString:</span><span class="n">thumbnailURL</span><span class="p">]</span> <span class="nl">toLocation:</span><span class="n">fileURL</span> <span class="nl">completion:</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>                    <span class="k">if</span> <span class="p">(</span><span class="n">error</span> <span class="o">==</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>                            <span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="nl">imageWithContentsOfFile:</span><span class="p">[</span><span class="n">fileURL</span> <span class="n">path</span><span class="p">]];</span>
+</span><span class='line'>                            <span class="n">UIImageView</span> <span class="o">*</span><span class="n">imageView</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIImageView</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithImage:</span><span class="n">image</span><span class="p">];</span>
+</span><span class='line'>                            <span class="p">[</span><span class="n">imageView</span> <span class="nl">setCenter:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">center</span><span class="p">];</span>
+</span><span class='line'>                            <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview:</span><span class="n">imageView</span><span class="p">];</span>
+</span><span class='line'>                        <span class="p">});</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                    <span class="k">else</span> <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Error downloading image: %@&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}];</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">else</span> <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;JSON parsing Error: %@&quot;</span><span class="p">,</span> <span class="n">jsonParsingError</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-03T18:34:00-05:00" pubdate data-updated="true">Mar 3<span>rd</span>, 2014</time>
+        
+      </p>
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://yoursite.com/ios-programming/nsurlsession-techniques/index.html" data-via="arivocals" data-counturl="http://yoursite.com/ios-programming/nsurlsession-techniques/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ariel Elkin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

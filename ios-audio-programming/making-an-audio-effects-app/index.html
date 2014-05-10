@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Making_an_audio_effects_app - Ariel Elkin's Website</title>
+  <meta name="author" content="Ariel Elkin">
+
+  
+  <meta name="description" content="Making_an_audio_effects_app Mar 20th, 2014 Intro In this tutorial we&rsquo;ll explore a technique for making iOS apps that manipulate sound on-the- &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yoursite.com/ios-audio-programming/making-an-audio-effects-app">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Ariel Elkin's Website" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/appbox.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ariel Elkin's Website</a></h1>
+  
+    <h2>Objective-C, Audio Programming, Programming Philosophy.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:yoursite.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects">My projects</a></li>
+  <li><a href="/objective-c">Objective-C</a></li>
+  <li><a href="/ios-programming">iOS Programming</a></li>
+  <li><a href="/ios-audio-programming">iOS Audio Programming</a></li>
+  <li><a href="/Portfolio">Sounds</a></li>
+  <li><a href="/">Philosophy</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Making_an_audio_effects_app</h1>
+    <p class="meta">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-20T00:37:00-04:00" pubdate data-updated="true">Mar 20<span>th</span>, 2014</time></p>
+  </header>
+  
+  <h2>Intro</h2>
+
+<p>In this tutorial we&rsquo;ll explore a technique for making iOS apps that manipulate sound on-the-fly.</p>
+
+<p> by combining two fantastic open-source libraries: The Amazing Audio Engine and the Synthesis Toolkit in C++.</p>
+
+<p>A good musical instrument needs to offer the user a substantial amount of control over its sound. Some apps play readymade audio files, other apps generate the audio from scratch. We&rsquo;ll use this second approach: our app will generate and control its own sounds.</p>
+
+<p>We&rsquo;ll need a <em>synthesizer</em> to generate the samples of audio according to user input, and an <em>audio engine</em> that will deliver the audio to the user. We&rsquo;ll use The Amazing Audio Engine as our audio engine and a class from the Synthesis Toolkit in C++ as our synthesizer.</p>
+
+<p>Our final result will be a handheld audio augmenter.</p>
+
+<h2>First steps</h2>
+
+<ol>
+<li>Open up Xcode and create a new project.</li>
+<li>In &ldquo;Choose a template for your new project&rdquo;:
+
+<ol>
+<li>Under the heading &ldquo;iOS&rdquo;, pick <strong>Application</strong></li>
+<li>Choose <strong>Single View Application</strong></li>
+<li>Click <strong>Next</strong></li>
+</ol>
+</li>
+<li>In &ldquo;Choose options for your new project&rdquo;:
+
+<ol>
+<li>For &ldquo;Product Name&rdquo;, enter <strong>Mandolin</strong></li>
+<li>Under &ldquo;Devices&rdquo;, select <strong>iPhone</strong>.</li>
+</ol>
+</li>
+<li>Click <strong>Next</strong> and save the project somewhere dear to you.</li>
+</ol>
+
+
+<h2>Add the Amazing Audio Engine</h2>
+
+<ol>
+<li>Add The Amazing Audio Engine to your project.
+
+<ol>
+<li><a href="http://theamazingaudioengine.com/doc/_getting-_started.html">Visit this page</a></li>
+<li>Follow steps 1-6. Follow them to the letter.</li>
+</ol>
+</li>
+<li>Open <strong>AppDelegate.m</strong>, under <code>#import "AppDelegate.h"</code> write</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AEAudioController.h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let’s see if you’ve correctly added TAAE. Build (⌘+B), make sure the build succeeds. If the build fails, you haven’t followed the above steps to the letter, go back and make sure you do. If the build succeeds, you get to move on.</p>
+
+<h2>Our audio plumbing</h2>
+
+<p>We&rsquo;ll be generating our Mandolin sound within a <em>channel</em>, and we&rsquo;ll connect this channel directly to the <em>audio engine</em>. The audio engine gathers the sound it receives from all the channels connected to it, and sends it to the headphones or speaker.</p>
+
+<p>Let&rsquo;s now set up our app&rsquo;s <em>audio engine</em>. Our audio engine will be the thing responsible for managing audio sources and outputs, and communicating with the OS. In TAAE, <code>AEAudioController</code> is the class that wraps the audio engine. We will place it inside our app delegate, for a couple of reasons:</p>
+
+<ul>
+<li>The app delegate should handle launch-time initialization of our core app components, and those include our audio engine.</li>
+<li>Given that the app delegate manages transitions to and from the background, it should deal with the audio engine during those transitions. For example, it should suspend audio rendering when our app is sent to the background.</li>
+</ul>
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-20T00:37:00-04:00" pubdate data-updated="true">Mar 20<span>th</span>, 2014</time>
+        
+      </p>
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://yoursite.com/ios-audio-programming/making-an-audio-effects-app/index.html" data-via="arivocals" data-counturl="http://yoursite.com/ios-audio-programming/making-an-audio-effects-app/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ariel Elkin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
