@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Ariel Elkin's Website]]></title>
-  <link href="http://yoursite.com/atom.xml" rel="self"/>
-  <link href="http://yoursite.com/"/>
-  <updated>2014-05-10T14:22:34-04:00</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://arielelkin.github.io/atom.xml" rel="self"/>
+  <link href="http://arielelkin.github.io/"/>
+  <updated>2014-05-10T17:44:56-04:00</updated>
+  <id>http://arielelkin.github.io/</id>
   <author>
     <name><![CDATA[Ariel Elkin]]></name>
     

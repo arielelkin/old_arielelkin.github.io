@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Locoquizz - Ariel Elkin's Website</title>
+  <meta name="author" content="Ariel Elkin">
+
+  
+  <meta name="description" content="Locoquizz May 10th, 2014 Welcome In this tutorial, we will write an iOS app that playfully tests a user&rsquo;s basic
+knowledge of nearby landmarks &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://arielelkin.github.io/iosworkshop">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Ariel Elkin's Website" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/appbox.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ariel Elkin's Website</a></h1>
+  
+    <h2>Objective-C, Audio Programming, Programming Philosophy.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:arielelkin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/projects">My projects</a></li>
+  <li><a href="/objective-c">Objective-C</a></li>
+  <li><a href="/ios-programming">iOS Programming</a></li>
+  <li><a href="/ios-audio-programming">iOS Audio Programming</a></li>
+  <li><a href="/Portfolio">Sounds</a></li>
+  <li><a href="/">Philosophy</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">Locoquizz</h1>
+    <p class="meta">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-10T14:23:00-04:00" pubdate data-updated="true">May 10<span>th</span>, 2014</time></p>
+  </header>
+  
+  <p><img class="right" src="http://i.imgur.com/46fEYE1.png" width="150" height="250" title="locoquizz_minisplash" ></p>
+
+<h3>Welcome</h3>
+
+<p>In this tutorial, we will write an iOS app that playfully tests a user&rsquo;s basic
+knowledge of nearby landmarks. The code for the completed tutorial is on
+Github:</p>
+
+<ul>
+<li><a href="https://github.com/arielelkin/LocoQuizz/archive/master.zip">Click here to download the full Xcode project of the completed app</a>, or</li>
+<li><a href="https://github.com/arielelkin/LocoQuizz">Read the code on Github</a></li>
+<li><a href="http://www.arivibes.com/downloads/Intro_to_iOS.pdf">Download the session&rsquo;s slides here.</a></li>
+</ul>
+
+
+<h3>Initial Setup</h3>
+
+<ol>
+<li> Open Xcode, create a new project using the <strong>Single View Application</strong> template. Click <strong>Next</strong>.</li>
+<li> Pick a name for the app (&ldquo;LocoQuizz&rdquo; is good). Leave all the other fields&#8217; defaults. Click <strong>Next</strong>.</li>
+<li> Save the project somewhere dear to you.</li>
+<li> We&rsquo;ll give our app an icon and a launch screen.
+
+<ul>
+<li><a href="http://arivibes.com/downloads/Loco_Quizz_Assets.zip">Help yourself to some assets here!</a></li>
+</ul>
+</li>
+<li> By default, the Simulator doesn&rsquo;t support WiFi Positioning, so we have to enable Location Simulation. Click on <strong>Product</strong> &mdash;> <strong>Scheme</strong> &mdash;> <strong>Edit Scheme</strong>. Open the <strong>Options</strong> tab. Make sure that &ldquo;Allow Location Simulation&rdquo; is ticked and that you have selected a Default Location.
+<img src="http://i.imgur.com/sfmNsqY.png" width="400"></li>
+</ol>
+
+
+<h3>The Welcome View</h3>
+
+<ol>
+<li> Open <strong>MainStoryboard.storyboard</strong>. This view controller will display our welcome view. Add text welcoming the user, and brief instructions. Add a button to start the game.
+<img src="http://i.imgur.com/eLvhRv5.png" width="400"></li>
+<li> This view controller will also fetch the user&rsquo;s location so that we have it from the outset.</li>
+<li> However, the game may start only once our location has been found! So the button must be disabled at the outset.</li>
+<li> Add code to <strong>ViewController.h</strong> and <strong>ViewController.m</strong> to
+
+<ul>
+<li>Conform to the CLLocationManagerDelegate protocol.</li>
+<li>Initialise our instance of <strong>CLLocationManager</strong></li>
+<li>Disable the Start Game button</li>
+</ul>
+</li>
+</ol>
+
+
+<h3>The Game View</h3>
+
+<ol>
+<li> Cmd+N to create a new file, select &ldquo;Objective-C class&rdquo; as the template. Name it <strong>GameViewController</strong>, a subclass of UIViewController, and save it.</li>
+<li> Go back to the Storyboard and add a View Controller to the right of the screen. Add a label for our quesion, three round rect buttons to display the answers, and a second label at the bottom to give the result to the user. Set number of lines in the labels to <strong>0</strong> to avoid truncation. <img src="http://arivibes.com/wp-content/uploads/2013/01/5.png" alt="5" /></li>
+<li> Specify the View Controller&rsquo;s class to <strong>GameViewController</strong>!</li>
+<li> In the Storyboard, create a modal segue from the welcome view (ViewController) to the game view (GameViewController).</li>
+<li> Pass the <strong>CLLocationCoordinate2D</strong> we have fetched in <strong>ViewController</strong> from <strong>ViewController</strong> to <strong>GameViewController</strong> using <strong>prepareForSegue</strong>. Print them in <strong>viewDidLoad</strong> to verify they&rsquo;ve been correctly fetched and transmitted from one view controller to the other.</li>
+</ol>
+
+
+<h3>Fetching online data</h3>
+
+<ol>
+<li> Here&rsquo;s what the syntax of our query URL will look like:</li>
+</ol>
+
+
+<blockquote><p><a href="https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE">https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE</a></p></blockquote>
+
+<ul>
+<li><a href="https://api.foursquare.com/v2/venues/search?ll=51.509980,-0.133700&amp;client_id=CPG1OA2FD0OE43PLES4MFOK133GSJADXF3DUMLO4CG0TKOEV&amp;client_secret=30UCWAOGHIVF1C3MSUQ1RNPEUBKO20S01DQCWUQ0LEKCNE4D&amp;v=20130126">FOURSQUARE API RESPONSE (JSON).</a></li>
+<li><a href="https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc">Here&rsquo;s a JSON Viewer for Chrome.</a></li>
+<li><a href="https://github.com/rfletcher/safari-json-formatter/downloads">Here&rsquo;s a JSON Viewer for Safari.</a></li>
+</ul>
+
+
+<h3>Making the query and processing the response</h3>
+
+<ol>
+<li> Scroll up <strong>GameViewController</strong> . Add the following instance variables:</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">NSMutableDictionary</span> <span class="o">*</span><span class="n">venuesDict</span><span class="p">;</span>
+</span><span class='line'><span class="n">NSString</span> <span class="o">*</span><span class="n">currentVenue</span><span class="p">;</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">correctAnswersCount</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li> Create a <strong>fetchGameContent</strong> method in <strong>GameViewController</strong> under <strong>viewDidLoad</strong>. This will build the query URL string and retrieve the JSON from FourSquare via a HTTP request.
+
+<ul>
+<li><a href="https://gist.github.com/arielelkin/5718605">Use the code from <strong>fetchGameContent</strong> here.</a></li>
+</ul>
+</li>
+<li> Turn the JSON data into objects, and place them into <strong>venuesDict</strong>.
+
+<ul>
+<li><a href="https://gist.github.com/arielelkin/5718605">Use the code from <strong>createVenuesDict</strong> here.</a>.</li>
+</ul>
+</li>
+</ol>
+
+
+<h3>Displaying the question</h3>
+
+<ol>
+<li> Scroll up <strong>GameViewController&rsquo;s</strong> . Specify <strong>IBOutlets</strong> for our three <strong>UIButtons</strong>, the question&rsquo;s <strong>UILabel</strong>, the result&rsquo;s <strong>UILabel</strong>.</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="kt">IBOutlet</span> <span class="n">UILabel</span> <span class="o">*</span><span class="n">questionLabel</span><span class="p">;</span>
+</span><span class='line'><span class="kt">IBOutlet</span> <span class="n">UIButton</span> <span class="o">*</span><span class="n">buttonOne</span><span class="p">;</span>
+</span><span class='line'><span class="kt">IBOutlet</span> <span class="n">UIButton</span> <span class="o">*</span><span class="n">buttonTwo</span><span class="p">;</span>
+</span><span class='line'><span class="kt">IBOutlet</span> <span class="n">UIButton</span> <span class="o">*</span><span class="n">buttonThree</span><span class="p">;</span>
+</span><span class='line'><span class="kt">IBOutlet</span> <span class="n">UILabel</span> <span class="o">*</span><span class="n">resultLabel</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li> Create a <code>nextQuestion</code> method which fills these up! It should get all the venues&#8217; names, pick one to quiz the user about, figure outs its category (the right answer), and get two other random categories to be displayed as the wrong answers.</li>
+<li> Open the Storyboard and ctrl+drag from File Owner to the buttons and the label.</li>
+<li> Test the app!</li>
+</ol>
+
+
+<h3>Checking the user&rsquo;s input</h3>
+
+<ol>
+<li> Create a <strong> userTappedAnswer:</strong> method which checks the user&rsquo;s answer against our <strong>venuesDict</strong>. We should also update the text in our <strong>resultLabel</strong> to keep the user in the loop!</li>
+<li> Open the storyboard and in <strong>GameViewController&rsquo;s</strong> ctrl+drag from the buttons to the File Owner. Let go and select <code>userTappedAnswer:</code>  .</li>
+</ol>
+
+
+<p><img src="http://i.imgur.com/iRsiu2l.png"></p>
+
+<ol>
+<li> Now test the app!</li>
+</ol>
+
+
+<h3>Improving the app</h3>
+
+<ol>
+<li> There&rsquo;s several cool and important things we now could add to our app (if time allows!) Below are some suggestions, let&rsquo;s take a vote&hellip;
+
+<ul>
+<li><a href="http://search.twitter.com/search.json?q=piccadilly%20circus&amp;amp;geocode=51.522199,-0.109762,25mi&amp;amp;show_user=true&amp;amp;lang=en">Fetch and display relevant Tweets to provide user with hints.</a></li>
+<li>Add animations.</li>
+<li>Randomise the order in which the buttons are displayed.</li>
+<li>Write a <strong>GameContentFetcher</strong> class to handle the content fetching.</li>
+<li><a href="http://www.reddit.com/search.json?q=site:imgur.com+piccadilly%20circus">Fetch and display relevant images (Reddit + Imgur) to provide user with hints.</a></li>
+<li>When app is resumed after going into the background, check if location is different to current.</li>
+<li>Play sounds.</li>
+<li>Add a <strong>MKMapView</strong> to the initial View Controller.</li>
+<li>Display <strong>UIAlertView</strong> if Core Location fails.</li>
+</ul>
+</li>
+</ol>
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-10T14:23:00-04:00" pubdate data-updated="true">May 10<span>th</span>, 2014</time>
+        
+      </p>
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://arielelkin.github.io/iosworkshop/index.html" data-via="arivocals" data-counturl="http://arielelkin.github.io/iosworkshop/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ariel Elkin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
