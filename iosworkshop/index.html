@@ -110,6 +110,7 @@ Github:</p>
 <ol>
 <li> Open Xcode, create a new project using the <strong>Single View Application</strong> template. Click <strong>Next</strong>.</li>
 <li> Pick a name for the app (&ldquo;LocoQuizz&rdquo; is good). Leave all the other fields&#8217; defaults. Click <strong>Next</strong>.</li>
+<li> Select &ldquo;iPhone&rdquo; as the Devices.</li>
 <li> Save the project somewhere dear to you.</li>
 <li> We&rsquo;ll give our app an icon and a launch screen.
 
@@ -125,11 +126,11 @@ Github:</p>
 <h3>The Welcome View</h3>
 
 <ol>
-<li> Open <strong>MainStoryboard.storyboard</strong>. This view controller will display our welcome view. Add text welcoming the user, and brief instructions. Add a button to start the game.
+<li> Open <strong>Main.storyboard</strong>. This view controller will display our welcome view. Add text welcoming the user, and brief instructions. Add a button to start the game.
 <img src="http://i.imgur.com/eLvhRv5.png" width="400"></li>
 <li> This view controller will also fetch the user&rsquo;s location so that we have it from the outset.</li>
 <li> However, the game may start only once our location has been found! So the button must be disabled at the outset.</li>
-<li> Add code to <strong>ViewController.h</strong> and <strong>ViewController.m</strong> to
+<li> Add code to <strong>ViewController.m</strong> to
 
 <ul>
 <li>Conform to the CLLocationManagerDelegate protocol.</li>
@@ -143,9 +144,9 @@ Github:</p>
 <h3>The Game View</h3>
 
 <ol>
-<li> Cmd+N to create a new file, select &ldquo;Objective-C class&rdquo; as the template. Name it <strong>GameViewController</strong>, a subclass of UIViewController, and save it.</li>
 <li> Go back to the Storyboard and add a View Controller to the right of the screen. Add a label for our quesion, three round rect buttons to display the answers, and a second label at the bottom to give the result to the user. Set number of lines in the labels to <strong>0</strong> to avoid truncation. <img src="http://arivibes.com/wp-content/uploads/2013/01/5.png" alt="5" /></li>
-<li> Specify the View Controller&rsquo;s class to <strong>GameViewController</strong>!</li>
+<li> Cmd+N to create a new file, select &ldquo;Objective-C class&rdquo; as the template. Name it <strong>GameViewController</strong>, a subclass of UIViewController, and save it.</li>
+<li> In the Storyboard, specify the View Controller&rsquo;s class to <strong>GameViewController</strong>!</li>
 <li> In the Storyboard, create a modal segue from the welcome view (ViewController) to the game view (GameViewController).</li>
 <li> Pass the <strong>CLLocationCoordinate2D</strong> we have fetched in <strong>ViewController</strong> from <strong>ViewController</strong> to <strong>GameViewController</strong> using <strong>prepareForSegue</strong>. Print them in <strong>viewDidLoad</strong> to verify they&rsquo;ve been correctly fetched and transmitted from one view controller to the other.</li>
 </ol>
@@ -153,17 +154,13 @@ Github:</p>
 
 <h3>Fetching online data</h3>
 
-<ol>
-<li> Here&rsquo;s what the syntax of our query URL will look like:</li>
-</ol>
+<p>Here&rsquo;s what the syntax of our query URL will look like:</p>
 
-
-<blockquote><p><a href="https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE">https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE</a></p></blockquote>
+<blockquote><p><pre><a href="https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE">https://api.foursquare.com/v2/venues/search?ll=myCoordinates&amp;client_id=MYCLIENTID&amp;client_secret=MYCLIENTSECRET&amp;v=DATE</a></pre></p></blockquote>
 
 <ul>
 <li><a href="https://api.foursquare.com/v2/venues/search?ll=51.509980,-0.133700&amp;client_id=CPG1OA2FD0OE43PLES4MFOK133GSJADXF3DUMLO4CG0TKOEV&amp;client_secret=30UCWAOGHIVF1C3MSUQ1RNPEUBKO20S01DQCWUQ0LEKCNE4D&amp;v=20130126">FOURSQUARE API RESPONSE (JSON).</a></li>
-<li><a href="https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc">Here&rsquo;s a JSON Viewer for Chrome.</a></li>
-<li><a href="https://github.com/rfletcher/safari-json-formatter/downloads">Here&rsquo;s a JSON Viewer for Safari.</a></li>
+<li>JSON not displaying nicely in your browser? Here&rsquo;s a JSON Viewer for <a href="https://chrome.google.com/webstore/detail/jsonview/chklaanhfefbnpoihckbnefhakgolnmc">Chrome</a> and one for <a href="https://github.com/rfletcher/safari-json-formatter/downloads">Safari</a>.</li>
 </ul>
 
 
@@ -184,7 +181,7 @@ Github:</p>
 
 
 <ol>
-<li> Create a <strong>fetchGameContent</strong> method in <strong>GameViewController</strong> under <strong>viewDidLoad</strong>. This will build the query URL string and retrieve the JSON from FourSquare via a HTTP request.
+<li> Create a <code>fetchGameContent</code> method in <strong>GameViewController</strong> under <strong>viewDidLoad</strong>. This will build the query URL string and retrieve the JSON from FourSquare via a HTTP request.
 
 <ul>
 <li><a href="https://gist.github.com/arielelkin/5718605">Use the code from <strong>fetchGameContent</strong> here.</a></li>
@@ -229,14 +226,9 @@ Github:</p>
 <h3>Checking the user&rsquo;s input</h3>
 
 <ol>
-<li> Create a <strong> userTappedAnswer:</strong> method which checks the user&rsquo;s answer against our <strong>venuesDict</strong>. We should also update the text in our <strong>resultLabel</strong> to keep the user in the loop!</li>
-<li> Open the storyboard and in <strong>GameViewController&rsquo;s</strong> ctrl+drag from the buttons to the File Owner. Let go and select <code>userTappedAnswer:</code>  .</li>
-</ol>
-
-
-<p><img src="http://i.imgur.com/iRsiu2l.png"></p>
-
-<ol>
+<li> Create a <code>userTappedAnswer:</code> method which checks the user&rsquo;s answer against our <strong>venuesDict</strong>. We should also update the text in our <strong>resultLabel</strong> to keep the user in the loop!</li>
+<li> Open the storyboard and in <strong>GameViewController&rsquo;s</strong> ctrl+drag from the buttons to the File Owner. Let go and select <code>userTappedAnswer:</code>
+<img src="http://i.imgur.com/iRsiu2l.png"></li>
 <li> Now test the app!</li>
 </ol>
 
