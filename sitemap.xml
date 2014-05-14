@@ -1,6 +1,22 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>http://arielelkin.github.io/apps/</loc>
+        <lastmod>2014-05-13T18:08:16-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://arielelkin.github.io/articles/</loc>
+        <lastmod>2014-05-14T01:12:55-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://arielelkin.github.io/articles/nsurlsession-techniques/</loc>
+        <lastmod>2014-03-20T22:04:35-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://arielelkin.github.io/articles/objective-c-multicast-delegate/</loc>
+        <lastmod>2014-05-14T01:14:05-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://arielelkin.github.io/blog/archives/</loc>
         <lastmod>2014-02-02T11:30:40-05:00</lastmod>
     </url>
@@ -9,49 +25,37 @@
         <lastmod>2014-03-30T20:00:30-04:00</lastmod>
     </url>
     <url>
+        <loc>http://arielelkin.github.io/contact/</loc>
+        <lastmod>2014-05-13T18:23:32-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://arielelkin.github.io/</loc>
-        <lastmod>2014-03-30T20:34:22-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/ios-audio-programming/</loc>
-        <lastmod>2014-04-06T04:15:33-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/ios-audio-programming/making-an-audio-effects-app/</loc>
-        <lastmod>2014-03-19T21:36:04-04:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://arielelkin.github.io/ios-audio-programming/using-the-amazing-audio-engine-with-the-synthesis-toolkit-in-c-plus-plus/
-        </loc>
-        <lastmod>2014-04-06T10:16:14-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/ios-programming/</loc>
-        <lastmod>2014-03-30T20:15:16-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/ios-programming/nsurlsession-techniques/</loc>
-        <lastmod>2014-03-20T22:04:35-04:00</lastmod>
+        <lastmod>2014-05-13T18:53:59-04:00</lastmod>
     </url>
     <url>
         <loc>http://arielelkin.github.io/iosworkshop/</loc>
         <lastmod>2014-05-11T14:20:31-04:00</lastmod>
     </url>
     <url>
-        <loc>http://arielelkin.github.io/objective-c/</loc>
-        <lastmod>2014-03-30T20:27:28-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/objective-c/objective-c-multicast-delegate/</loc>
-        <lastmod>2014-03-19T20:49:28-04:00</lastmod>
-    </url>
-    <url>
-        <loc>http://arielelkin.github.io/projects/</loc>
-        <lastmod>2014-04-05T08:49:53-04:00</lastmod>
+        <loc>http://arielelkin.github.io/libraries/</loc>
+        <lastmod>2014-05-13T18:13:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://arielelkin.github.io/robots.txt</loc>
         <lastmod>2014-02-02T11:30:40-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://arielelkin.github.io/tutorials/</loc>
+        <lastmod>2014-05-13T18:12:30-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://arielelkin.github.io/tutorials/making-an-audio-effects-app/</loc>
+        <lastmod>2014-03-19T21:36:04-04:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://arielelkin.github.io/tutorials/using-the-amazing-audio-engine-with-the-synthesis-toolkit-in-c-plus-plus/
+        </loc>
+        <lastmod>2014-04-06T10:16:14-04:00</lastmod>
     </url>
 </urlset>
