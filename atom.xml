@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Ariel Elkin's iOS]]></title>
+  <title><![CDATA[Ariel Elkin's website]]></title>
   <link href="http://arielelkin.github.io/atom.xml" rel="self"/>
   <link href="http://arielelkin.github.io/"/>
-  <updated>2014-06-07T16:43:01-07:00</updated>
+  <updated>2014-06-07T16:54:43-07:00</updated>
   <id>http://arielelkin.github.io/</id>
   <author>
     <name><![CDATA[Ariel Elkin]]></name>
