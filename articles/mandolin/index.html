@@ -433,19 +433,19 @@
 
 <p>STK classes have a <code>tick()</code> function which computes and generates one sample of audio; <code>myMandolin-&gt;tick()</code> returns consecutive samples of mandolin audio.</p>
 
-<p>The STK classes compute and output one consecutive sample at a time, their <code>tick()</code> function returns one sample of computed audio, which we place in our audio buffers. The STK objects tick according to their state. So <code>tick()</code> returns <code>0</code> (i.e. silence) if we haven&rsquo;t plucked the mandolin, but if you pluck it it&rsquo;ll start to return a number.</p>
+<p>The STK classes compute and output one consecutive sample at a time, their <code>tick()</code> function returns one sample of computed audio, which we place in our audio buffers. The STK objects tick according to their state. So <code>tick()</code> returns <code>0</code> (i.e. silence) if we haven&rsquo;t plucked the mandolin, but if you pluck it it&rsquo;ll return a number higher or lower than <code>0</code>.</p>
 
-<p>The <code>for</code> loop places the output of <code>myMandolin-&gt;tick()</code> in the audio buffers.</p>
+<h3>Understanding <code>AudioBuffers</code></h3>
 
-<h3>Understanding AudioBuffers</h3>
+<p>The <code>for</code> loop places the output of <code>myMandolin-&gt;tick()</code> in the audio buffers. Let&rsquo;s take a closer look at how that works.</p>
+
+<p>An <code>AudioBuffer</code> is a <code>struct</code> that contains audio (and data about the audio). Its <code>mData</code> member points to the buffer&rsquo;s audio data. This is an array, each member of this array is a sample. The audio samples we place in this array will be delivered to the headphones.</p>
 
 <p>The STK works with <em>non-interleaved</em> audio, which means that there is one <code>AudioBuffer</code> for the left channel: <code>audio-&gt;mBuffers[0]</code>, and one <code>AudioBuffer</code> for the right channel: <code>audio-&gt;mBuffers[1]</code>.</p>
 
-<p>An <code>AudioBuffer</code> is a <code>struct</code> that contains audio (and data about the audio). Its <code>mData</code> member points to the buffer&rsquo;s audio data. This is an array, each member of this array is a sample.</p>
+<p>The <code>frames</code> argument in the block specifies the number of samples in a buffer, i.e. the length of the array over which the <code>for</code> loop is iterating.</p>
 
-<p>The <code>frames</code> argument in the block specifies the number of samples in a buffer, i.e. the length of the array.</p>
-
-<p><code>Mandolin</code> produces mono sound, which is we&rsquo;re placing its sample in both the left and the right channel.</p>
+<p><code>Mandolin</code> produces mono sound, which is why we&rsquo;re placing its sample in both the left and the right channel.</p>
 
 <h2>Outro</h2>
 
