@@ -295,15 +295,6 @@
 
 <p>Then, we send a <code>start</code> message to the audioController, to tell it to start processing audio. <code>start</code> returns a <code>BOOL</code>: <code>YES</code> if it successfully started the audio engine, and <code>NO</code> otherwise. <code>start</code>&rsquo;s only parameter is a pointer to an <code>NSError</code> object, and if an error occurs, the pointer is set to an error object containing the error information.  We want to be prepared for any errors; so we&rsquo;ll check <code>start</code>&rsquo;s return value, if there&rsquo;s an error, print <code>errorAudioSetup</code>, let the user gracefully know, etc.</p>
 
-<h3>Rawwaves</h3>
-
-<p><code>Mandolin</code> makes use of hard-coded waveforms to generate sound. These waveforms are in the STK, but we currently need to manually tell the STK where they are. To do that, at the bottom of the <code>viewDidLoad</code> code we wrote, add this line:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">stk</span><span class="o">::</span><span class="n">Stk</span><span class="o">::</span><span class="n">setRawwavePath</span><span class="p">([[[</span><span class="n">NSBundle</span> <span class="n">mainBundle</span><span class="p">]</span> <span class="nl">pathForResource:</span><span class="s">@&quot;rawwaves&quot;</span> <span class="nl">ofType:</span><span class="s">@&quot;bundle&quot;</span><span class="p">]</span> <span class="n">UTF8String</span><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
 <h2>Add the STK</h2>
 
 <p>If you’re using CocoaPods: add <code>pod 'STK'</code> to your podfile and run <code>pod install</code>.</p>
@@ -320,6 +311,15 @@
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;AEBlockChannel.h&quot;</span>
 </span><span class='line'><span class="cp">#import &quot;Mandolin.h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Rawwaves</h3>
+
+<p>The <code>Mandolin</code> class we&rsquo;ll use makes use of hard-coded waveforms to generate sound. These waveforms are in the STK, but we need to manually tell the STK where they are. To do that, at the bottom of the <code>viewDidLoad</code> code we wrote, add this line:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">stk</span><span class="o">::</span><span class="n">Stk</span><span class="o">::</span><span class="n">setRawwavePath</span><span class="p">([[[</span><span class="n">NSBundle</span> <span class="n">mainBundle</span><span class="p">]</span> <span class="nl">pathForResource:</span><span class="s">@&quot;rawwaves&quot;</span> <span class="nl">ofType:</span><span class="s">@&quot;bundle&quot;</span><span class="p">]</span> <span class="n">UTF8String</span><span class="p">]);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
