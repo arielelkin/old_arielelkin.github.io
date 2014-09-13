@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>UILabel + UIScrollView + Auto Layout - Ariel Elkin's website</title>
+  <meta name="author" content="Ariel Elkin">
+
+  
+  <meta name="description" content="UILabel + UIScrollView + Auto Layout Sep 13th, 2014 Introduction In this article I&rsquo;ll explain how to easily fit a UILabel of variable height &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Ariel Elkin's website" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="/stylesheets/appbox.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-51731054-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ariel Elkin's website</a></h1>
+  
+    <h2>iOS Developer.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:arielelkin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/apps">Apps</a></li>
+  <li><a href="/libraries">Libraries</a></li>
+  <li><a href="/articles">Articles</a></li>
+  <li><a href="/cooking">Cooking</a></li>
+  <li><a href="/contact">Contact</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article role="article">
+  
+  <header>
+    <h1 class="entry-title">UILabel + UIScrollView + Auto Layout</h1>
+    <p class="meta">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-13T18:49:00-03:00" pubdate data-updated="true">Sep 13<sup>th</sup>, 2014</time></p>
+  </header>
+  
+  <h2>Introduction</h2>
+
+<p>In this article I&rsquo;ll explain how to easily fit a <code>UILabel</code> of variable height into a <code>UIScrollView</code> using Auto Layout.</p>
+
+<p>Why? Because Auto Layout will make sure the label&rsquo;s <code>frame</code> and the scrollview&rsquo;s <code>contentSize</code> will be the ones you want, regardless of orientation and device size. No more calls to <code>sizeToFit</code> or <code>setContentSize</code>!</p>
+
+<p><img src="http://i.imgur.com/Dogopki.png" width="200"></p>
+
+<h2>Code</h2>
+
+<p>You can go ahead and copy and paste this in an empty view controller to see in action:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">super</span> <span class="n">viewDidLoad</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/*** Init the scrollview and the label ***/</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">UIScrollView</span> <span class="o">*</span><span class="n">scrollView</span><span class="o">=</span> <span class="p">[</span><span class="n">UIScrollView</span> <span class="n">new</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">scrollView</span><span class="p">.</span><span class="n">translatesAutoresizingMaskIntoConstraints</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">addSubview</span><span class="o">:</span><span class="n">scrollView</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">UILabel</span> <span class="o">*</span><span class="n">scrollViewLabel</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UILabel</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">scrollViewLabel</span><span class="p">.</span><span class="n">numberOfLines</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scrollViewLabel</span><span class="p">.</span><span class="n">translatesAutoresizingMaskIntoConstraints</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">scrollView</span> <span class="n">addSubview</span><span class="o">:</span><span class="n">scrollViewLabel</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">scrollViewLabel</span><span class="p">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">@&quot;Bacon ipsum dolor sit amet drumstick meatloaf filet mignon ham t-bone andouille meatball venison cow capicola jerky shankle shoulder ground round. Shank filet mignon pork chop ham hock, short ribs jerky prosciutto tongue porchetta. Biltong kevin strip steak tail jowl jerky boudin drumstick pastrami bresaola. Sirloin tail shoulder salami, hamburger beef doner turducken chuck boudin kielbasa sausage pork loin. Ball tip leberkas fatback, pork chop tail ham ribeye. Bresaola pancetta jerky beef kielbasa frankfurter, corned beef filet mignon ribeye tongue porchetta. Prosciutto short loin sirloin doner brisket jerky swine sausage bresaola chuck. Meatloaf pork chop ribeye bacon jerky turducken, andouille pork belly beef ribs ham hock leberkas. Andouille tri-tip capicola beef t-bone shank tenderloin turducken ball tip salami pork belly shankle. Kielbasa pastrami brisket, kevin spare ribs swine tail beef jerky venison filet mignon. Kevin leberkas ball tip, brisket bresaola chuck meatloaf beef doner drumstick hamburger capicola chicken. Tri-tip biltong drumstick pork prosciutto strip steak pastrami brisket shank hamburger flank tail cow. Pastrami beef ribs ribeye boudin spare ribs pork loin. Meatloaf tail pork belly strip steak doner. T-bone meatball pastrami, pork strip steak salami tail beef boudin leberkas. Venison t-bone fatback, pig brisket pork loin landjaeger turkey tri-tip biltong. Drumstick tri-tip hamburger boudin meatball pork pork chop short ribs chuck doner t-bone bacon frankfurter porchetta beef. Turkey cow meatball andouille pancetta, flank strip steak ham hock. Frankfurter corned beef rump turducken brisket, jerky short loin flank tri-tip ball tip ham hock swine spare ribs.&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/*** Auto Layout ***/</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSDictionary</span> <span class="o">*</span><span class="n">views</span> <span class="o">=</span> <span class="n">NSDictionaryOfVariableBindings</span><span class="p">(</span><span class="n">scrollView</span><span class="p">,</span> <span class="n">scrollViewLabel</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSArray</span> <span class="o">*</span><span class="n">scrollViewLabelConstraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSLayoutConstraint</span> <span class="n">constraintsWithVisualFormat</span><span class="o">:</span><span class="s">@&quot;H:|[scrollViewLabel(scrollView)]&quot;</span> <span class="n">options</span><span class="o">:</span><span class="mi">0</span> <span class="n">metrics</span><span class="o">:</span><span class="nb">nil</span> <span class="n">views</span><span class="o">:</span><span class="n">views</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">scrollView</span> <span class="n">addConstraints</span><span class="o">:</span><span class="n">scrollViewLabelConstraints</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">scrollViewLabelConstraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSLayoutConstraint</span> <span class="n">constraintsWithVisualFormat</span><span class="o">:</span><span class="s">@&quot;V:|[scrollViewLabel]|&quot;</span> <span class="n">options</span><span class="o">:</span><span class="mi">0</span> <span class="n">metrics</span><span class="o">:</span><span class="nb">nil</span> <span class="n">views</span><span class="o">:</span><span class="n">views</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">scrollView</span> <span class="n">addConstraints</span><span class="o">:</span><span class="n">scrollViewLabelConstraints</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NSArray</span> <span class="o">*</span><span class="n">scrollViewConstraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSLayoutConstraint</span> <span class="n">constraintsWithVisualFormat</span><span class="o">:</span><span class="s">@&quot;H:|-[scrollView]-|&quot;</span> <span class="n">options</span><span class="o">:</span><span class="mi">0</span> <span class="n">metrics</span><span class="o">:</span><span class="nb">nil</span> <span class="n">views</span><span class="o">:</span><span class="n">views</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">addConstraints</span><span class="o">:</span><span class="n">scrollViewConstraints</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">scrollViewConstraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSLayoutConstraint</span> <span class="n">constraintsWithVisualFormat</span><span class="o">:</span><span class="s">@&quot;V:|-[scrollView]-|&quot;</span> <span class="n">options</span><span class="o">:</span><span class="mi">0</span> <span class="n">metrics</span><span class="o">:</span><span class="nb">nil</span> <span class="n">views</span><span class="o">:</span><span class="n">views</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">addConstraints</span><span class="o">:</span><span class="n">scrollViewConstraints</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Explanation</h2>
+
+<h3><code>@"H:|[scrollViewLabel(scrollView)]"</code></h3>
+
+<p>This means: &ldquo;The width of the label must be equal to the scrollview&rsquo;s width&rdquo;.</p>
+
+<p>In AutoLayout, the <code>contentSize</code> of a scroll view is determined by the size of its subviews. So because the label is the scrollview&rsquo;s only subview, that constraint also implicitly means &ldquo;Set the width of the scrollview&rsquo;s <code>contentsize</code> to the width of the label&rdquo;.</p>
+
+<h3><code>@"V:|[scrollViewLabel]|"</code></h3>
+
+<p>This means: &ldquo;The height of the scrollview label must take up all the vertical space it needs within its superview. The scrollview&rsquo;s <code>contentSize</code>&rsquo;s height must also be equal to it&rdquo;.</p>
+
+<h2>References aka Further Reading</h2>
+
+<h3>Articles</h3>
+
+<ul>
+<li>&ldquo;Dynamic UILabel height inside UIScrollView with Autolayout&rdquo; question on Stackoverflow. <a href="http://stackoverflow.com/questions/19192141/dynamic-uilabel-height-inside-uiscrollview-with-autolayout">Link</a></li>
+</ul>
+
+
+<h3>Documentation</h3>
+
+<ul>
+<li>&ldquo;Apple Technical Note TN2154: UIScrollView And Autolayout&rdquo;. <em>iOS Developer Library.</em> <a href="https://developer.apple.com/library/ios/technotes/tn2154/_index.html">Link</a></li>
+</ul>
+
+
+<h3>Filler Text</h3>
+
+<ul>
+<li>&ldquo;Bacon Ipsum: A Meatier Lorem Ipsum Generator&rdquo;. <a href="http://baconipsum.com/">Link</a></li>
+</ul>
+
+
+  
+    <footer>
+      <p class="meta">
+        
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-13T18:49:00-03:00" pubdate data-updated="true">Sep 13<sup>th</sup>, 2014</time>
+        
+      </p>
+      
+        <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout/index.html" data-via="arivocals" data-counturl="http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout/index.html" >Tweet</a>
+  
+  
+  
+</div>
+
+      
+    </footer>
+  
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Ariel Elkin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'arielelkin';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout/index.html';
+        var disqus_url = 'http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout/index.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
