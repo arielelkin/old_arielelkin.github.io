@@ -1,105 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  
-  
   <url>
     <loc>http://arielelkin.github.io/blog/archives/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/blog/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/nsurlsession-techniques/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/making-an-audio-effects-app/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/mandolin/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/uilabel-plus-uiscrollview-plus-autolayout/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/apps/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/libraries/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/contact/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/cooking/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/articles/objective-c-multicast-delegate/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/iosworkshop/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-  
   <url>
     <loc>http://arielelkin.github.io/</loc>
-    <lastmod>2015-02-05T18:01:22+01:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
-  
-  
 </urlset>
